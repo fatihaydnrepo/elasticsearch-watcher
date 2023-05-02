@@ -20,8 +20,11 @@ Uygulamaya geçmeden önce, Watcher'ın nasıl çalıştığını anlamaya çal�
 -   Actions
 
 **Schedule** :  Watcher 'ın ne zaman çalıştırılacağını ve belirli bir zaman dilimi boyunca hangi verilerin inceleneceğini belirlemek için kullanılır. 
+
 **Query** :  Bir koşulla sonucu karşılaştırarak sorgulama yapmak için sorulacak bir sorudur ve DSL'deki tüm özellikler kullanılabilir.
+
 **Condition** : Sorgumuzun sonucunu karşılaştırır ve eğer koşula uygunsa eylemi gerçekleştiririz.
+
 **Actions** : Bilgi gönderme işlemini bu katman ile belirleyebiliriz. 
 
 Örneğin, aşağıda paylaştığım kod bloğunu ele alabiliriz. 
