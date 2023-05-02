@@ -25,7 +25,7 @@ Uygulamaya geçmeden önce, Watcher'ın nasıl çalıştığını anlamaya çal�
 **Actions** : Bilgi gönderme işlemini bu katman ile belirleyebiliriz. 
 
 Örneğin, aşağıda paylaştığım kod bloğunu ele alabiliriz. 
-'''json
+```json
 PUT _watcher/watch/log_errors
 {
   "metadata" : { 
