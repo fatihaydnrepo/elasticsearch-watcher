@@ -26,7 +26,7 @@ Uygulamaya geçmeden önce, Watcher'ın nasıl çalıştığını anlamaya çal�
 
 Örneğin, aşağıda paylaştığım kod bloğunu ele alabiliriz. 
 ```json
- { PUT _watcher/watch/log_errors
+  PUT _watcher/watch/log_errors
 {
   "metadata" : { 
     "color" : "red"
