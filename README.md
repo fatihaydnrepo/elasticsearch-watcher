@@ -1,3 +1,4 @@
+
 # ELASTİCSEARCH WATCHER 
 
 ![enter image description here](https://raw.githubusercontent.com/fatihaydnrepo/elasticsearch-watcher/main/watcher1.png)
@@ -7,10 +8,10 @@ Elasticsearch Watcher, Elasticsearch verilerinizdeki değişikliklere dayalı **
 
 Örneğin, log verilerindeki bir aramada son 5 dakikada çok sayıda 503 hatası olduğunu belirlediğinde, bir izleme (watch) yapılandırarak sistem yöneticisine e-posta göndermek için bir işlem gerçekleştirebilirsiniz.
 
-## Nasıl çalışır ? 
+### Nasıl çalışır ? 
 
 
-Watcher ; bir trigger ,  bir girdi, bir işlem ve bir çıktıdan oluşur. Triggeri, izlemenin ne zaman başlatılacağını belirler. Girdi, izleme yükünü tanımlar ve veri kaynaklarını belirtir. İşlem, koşullar karşılandığında gerçekleştirilecek aksiyonları tanımlar. Çıktı, işlem sonucunun nereye gönderileceğini belirtir.
+Watcher ; bir trigger ,  bir input, bir işlem ve bir output'tan oluşur. Triggeri, watcher'ın ne zaman başlatılacağını belirler. İnput,  watcher payload'ı tanımlar ve veri kaynaklarını belirtir. İşlem, koşullar karşılandığında gerçekleştirilecek aksiyonları tanımlar. Output , işlem sonucunun nereye gönderileceğini belirtir.
 
 Uygulamaya geçmeden önce, Watcher'ın nasıl çalıştığını anlamaya çalışalım.
 
@@ -90,3 +91,87 @@ Uygulamaya geçmeden önce, Watcher'ın nasıl çalıştığını anlamaya çal�
     }
   }
 }
+```
+Metadata - Watcher için isteğe bağlı olarak  statik meta verileri ekleyebilirsiniz.
+
+Trigger - Zamanlamayı tetikler , izlemeyi her 5 dakikada bir çalıştırır.
+
+Input - log-events ' de bulunan hataları arar ve yanıtı Watch payload'a aktarır.
+  
+Condition - Bu koşul, izleme sürecinde kullanılan verilerin değerlerini kontrol eder ve belirli bir eylem gerçekleştirmek için gerekli olan şartları sağlamak için tasarlanmıştır. 
+
+Transform - Condition karşılanırsa, bu Transform tüm hataları watch payload'a  yükler.
+
+Actions - email_administrator eylemi, sistem yöneticisine öncelikli bir e-posta gönderir. Hata içerenwatch payload e-postaya eklenir.
+
+###  Watcher APIs
+
+1. Watcher'ı oluşturmak için aşağıdaki kodu kullanabiliriz
+```json
+PUT _xpack/watcher/watch/watch_name  
+{  
+\\Body  
+}
+```
+2. Get Watcher
+> GET _xpack/watcher/watch/watch_name
+
+3. Aktifleştirme/Pasifleştirme işlemi için ; 
+> PUT _xpack/watcher/watch/watch_name/_activate/
+>PUT _xpack/watcher/watch/watch_name/_deactivate
+
+4. Execute Watcher
+> PUT _xpack/watcher/watch/watch_name/_execute
+
+Bu işlemleri yaptığımızda watcher'ın son hali aşağıdaki şekilde olmalı, ayrıca beat'lerdeki log kayıpları için, fatih@outlook.com adresine mail göndermesini de isteyelim, beat'in adıda deneme olsun.
+```json
+PUT _watcher/watch/deneme-watch
+{
+  "trigger": {
+    "schedule": {
+      "interval": "5m"
+    }
+  },
+  "input": {
+    "search": {
+      "request": {
+        "indices": [
+          "beat-*"
+        ],
+        "body": {
+          "query": {
+            "match": {
+              "message": "Failed to publish events"
+            }
+          }
+        }
+      }
+    }
+  },
+  "condition": {
+    "compare": {
+      "ctx.payload.hits.total": {
+        "gt": 0
+      }
+    }
+  },
+  "actions": {
+    "send_email": {
+      "email": {
+        "profile": "standard",
+        "to": "fatih@outlook.com",
+        "subject": "Log kaybı tespit edildi",
+        "body": {
+          "text": "Deneme beat'lerinde log kaybı tespit edildi. Ayrıntılar aşağıdadır:\n\n{{#ctx.payload.hits.hits}}{{_source.message}}\n{{/ctx.payload.hits.hits}}"
+        }
+      }
+    }
+  }
+}
+```
+
+
+
+
+  
+
